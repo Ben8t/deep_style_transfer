@@ -32,13 +32,8 @@ target_size = (target_heigth, target_width)
 
 content_image_origin = Image.open(content_image_path)
 content_image_origin_size = content_image_origin.size
-# content_image = load_img(path=content_image_path, target_size=target_size)
-# content_image_array = img_to_array(content_image)
-# content_image_array = K.variable(preprocess_input(np.expand_dims(content_image_array, axis=0)), dtype='float32')  # adequate image to the format the model requires
+
 content_image_array = image_processing(content_image_path, target_size)
-# style_image = load_img(path=style_image_path, target_size=target_size)
-# style_image_array = img_to_array(style_image)
-# style_image_array = K.variable(preprocess_input(np.expand_dims(style_image_array, axis=0)), dtype='float32')  # adequate image to the format the model requires
 style_image_array = image_processing(style_image_path, target_size)
 
 generated_image_0 = np.random.randint(256, size=(target_width, target_heigth, 3)).astype('float64')
@@ -149,7 +144,7 @@ P = get_feature_reps(x=content_image_array, layer_names=[content_layer_names], m
 As = get_feature_reps(x=style_image_array, layer_names=style_layer_names, model=style_model)
 ws = np.ones(len(style_layer_names))/float(len(style_layer_names))
 
-iterations = 1
+iterations = 50
 x_val = generated_image_0.flatten()
 start = time.time()
 xopt, f_val, info= fmin_l_bfgs_b(calculate_loss, x_val, fprime=get_grad,

@@ -144,7 +144,7 @@ P = get_feature_reps(x=content_image_array, layer_names=[content_layer_names], m
 As = get_feature_reps(x=style_image_array, layer_names=style_layer_names, model=style_model)
 ws = np.ones(len(style_layer_names))/float(len(style_layer_names))
 
-iterations = 50
+iterations = 250
 x_val = generated_image_0.flatten()
 start = time.time()
 xopt, f_val, info= fmin_l_bfgs_b(calculate_loss, x_val, fprime=get_grad,

@@ -7,14 +7,14 @@ from keras.applications.vgg16 import preprocess_input
 from keras.layers import Input
 from scipy.optimize import fmin_l_bfgs_b
 import time
-
+import os
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~##
 ## Specify paths for 1) content image 2) style image and 3) generated image
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~##
 
 content_image_path = "examples/content_image_1.jpg"
 style_image_path = "examples/style_image_1.jpg"
-generated_image_ouput_path = "examples/generated_image_1.jpg"
+generated_image_ouput_path = "results/generated_image_1.jpg"
 
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~##
 ## Image processing
@@ -121,10 +121,10 @@ def reprocess_array(x):
     x = preprocess_input(x)
     return x
 
-def save_original_size(x, target_size=content_image_origin_size):
+def save_original_size(x, image_ouput_path, target_size=content_image_origin_size):
     x_image = Image.fromarray(x)
     x_image = x_image.resize(target_size)
-    x_image.save(generated_image_ouput_path)
+    x_image.save(image_ouput_path)
     return x_image
 
 tf_session = K.get_session()
@@ -144,13 +144,16 @@ P = get_feature_reps(x=content_image_array, layer_names=[content_layer_names], m
 As = get_feature_reps(x=style_image_array, layer_names=style_layer_names, model=style_model)
 ws = np.ones(len(style_layer_names))/float(len(style_layer_names))
 
-iterations = 250
+iterations = 600
 x_val = generated_image_0.flatten()
 start = time.time()
+
+# TODO: add in optimizer callback=save_image
 xopt, f_val, info= fmin_l_bfgs_b(calculate_loss, x_val, fprime=get_grad,
-                            maxiter=iterations, disp=True)
+                            maxiter=iterations, disp=True) 
 x_out = postprocess_array(xopt)
-x_image = save_original_size(x_out)
+x_image = save_original_size(x_out, generated_image_ouput_path)
 print("Image saved")
 end = time.time()
 print("Time taken: {}'".format(end-start))
+
